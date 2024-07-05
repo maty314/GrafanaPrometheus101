@@ -29,3 +29,37 @@ jobs:
         docker-compose down
         docker-compose up -d
 
+    - name: Wait for services to start
+      run: sleep 30
+
+    - name: Check Prometheus
+      run: |
+        curl -sf http://localhost:9090/metrics || exit 1
+
+    - name: Check Node Exporter
+      run: |
+        curl -sf http://localhost:9100/metrics || exit 1
+
+    - name: Check Grafana
+      run: |
+        response=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000)
+        if [ "$response" -ne 200 ]; then
+          exit 1
+        fi
+
+    - name: Check Prometheus targets
+      run: |
+        response=$(curl -s http://localhost:9090/api/v1/targets | jq '.data.activeTargets | length')
+        if [ "$response" -lt 1 ]; then
+          echo "No active targets found in Prometheus"
+          exit 1
+        fi
+
+    - name: Check Grafana Dashboard
+      run: |
+        response=$(curl -s http://localhost:3000/api/dashboards/uid/your-dashboard-uid -u admin:admin)
+        if [[ $response != *"cpu"* ]]; then
+          echo "CPU dashboard not found"
+          exit 1
+        fi
+
