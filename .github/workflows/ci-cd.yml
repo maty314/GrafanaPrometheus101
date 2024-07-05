@@ -55,9 +55,9 @@ jobs:
           exit 1
         fi
 
-    - name: Check Grafana Dashboard
+    - name: Check Grafana Dashboard #being adqssyxe0dkaoa the uid of CPU dashboard out of the box 
       run: |
-        response=$(curl -s http://localhost:3000/api/dashboards/uid/your-dashboard-uid -u admin:admin)
+        response=$(curl -s http://localhost:3000/api/dashboards/uid/adqssyxe0dkaoa -u admin:admin)
         if [[ $response != *"cpu"* ]]; then
           echo "CPU dashboard not found"
           exit 1
