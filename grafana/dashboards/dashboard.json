@@ -1,7 +1,7 @@
 {
   "datasource": {
     "type": "prometheus",
-    "uid": "ddqry85rcrchsc"
+    "uid": "PBFA97CFB590B2093"
   },
   "fieldConfig": {
     "defaults": {
@@ -94,6 +94,6 @@
       "useBackend": false
     }
   ],
-  "title": "Panel Title",
+  "title": "Up Checker",
   "type": "timeseries"
 }
