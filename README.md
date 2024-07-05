@@ -13,7 +13,7 @@ This project sets up a basic monitoring system using Grafana and Prometheus with
 
 - `docker-compose.yml`: Docker Compose configuration.
 - `prometheus/prometheus.yml`: Prometheus configuration.
-- 'grafana/provisioning/datasources/datasource.yaml': Grafana datasource for Prometheus.
-- 'grafana/provisioning/dashboards/dashboard.yaml': Grafana dashboard configuration.
-- 'grafana/dashboards/dashboard.yml': Out of the box dashboard to check if Prometheus is up. 
+- `grafana/provisioning/datasources/datasource.yaml`: Grafana datasource for Prometheus.
+- `grafana/provisioning/dashboards/dashboard.yaml`: Grafana dashboard configuration.
+- `grafana/dashboards/dashboard.yml`: Out of the box dashboard to check if Prometheus is up. 
 
