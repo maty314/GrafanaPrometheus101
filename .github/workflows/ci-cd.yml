@@ -6,67 +6,68 @@ on:
       - master
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Login to DockerHub
-      uses: docker/login-action@v1
-      with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
-    - name: Build and push Docker images
-      run: |
-        docker-compose -f docker-compose.yml build
-        docker-compose -f docker-compose.yml push
+      - name: Build and push Docker images
+        run: |
+          docker-compose -f docker-compose.yml build
+          docker-compose -f docker-compose.yml push
 
-    - name: Deploy to Docker Compose
-      run: |
-        docker-compose down
-        docker-compose up -d
+      - name: Deploy to Docker Compose
+        run: |
+          docker-compose down
+          docker-compose up -d
 
-    - name: Wait for services to start
-      run: sleep 30
+      - name: Wait for services to start
+        run: sleep 30
 
-    - name: Check Prometheus
-      run: |
-        curl -sf http://localhost:9090/metrics || exit 1
+      - name: Check Prometheus
+        run: |
+          curl -sf http://localhost:9090/metrics || exit 1
 
-    - name: Check Node Exporter
-      run: |
-        curl -sf http://localhost:9100/metrics || exit 1
+      - name: Check Node Exporter
+        run: |
+          curl -sf http://localhost:9100/metrics || exit 1
 
-    - name: Check Grafana
-      env:
-        GF_SECURITY_ADMIN_USER: ${{ secrets.GF_SECURITY_ADMIN_USER }}
-        GF_SECURITY_ADMIN_PASSWORD: ${{ secrets.GF_SECURITY_ADMIN_PASSWORD }}
-      run: |
-        response=$(curl -s -o /dev/null -w "%{http_code}" -u $GF_SECURITY_ADMIN_USER:$GF_SECURITY_ADMIN_PASSWORD http://localhost:3000)
-        echo "HTTP Response Code: $response"
-        if [ "$response" -ne 200 ]; then
-          echo "Grafana not accessible"
-          exit 1
-        fi
+      - name: Check Grafana
+        env:
+          GF_SECURITY_ADMIN_USER: ${{ secrets.GF_SECURITY_ADMIN_USER }}
+          GF_SECURITY_ADMIN_PASSWORD: ${{ secrets.GF_SECURITY_ADMIN_PASSWORD }}
+        run: |
+          response=$(curl -s -o /dev/null -w "%{http_code}" -u $GF_SECURITY_ADMIN_USER:$GF_SECURITY_ADMIN_PASSWORD http://localhost:3000)
+          echo "HTTP Response Code: $response"
+          if [ "$response" -ne 200 ]; then
+            echo "Grafana not accessible"
+            exit 1
+          fi
 
-    - name: Check Prometheus targets
-      run: |
-        response=$(curl -s http://localhost:9090/api/v1/targets | jq '.data.activeTargets | length')
-        if [ "$response" -lt 1 ]; then
-          echo "No active targets found in Prometheus"
-          exit 1
-        fi
+      - name: Check Prometheus targets
+        run: |
+          response=$(curl -s http://localhost:9090/api/v1/targets | jq '.data.activeTargets | length')
+          if [ "$response" -lt 1 ]; then
+            echo "No active targets found in Prometheus"
+            exit 1
+          fi
 
-    - name: Check Grafana Dashboard #being adqssyxe0dkaoa the uid of CPU dashboard out of the box
-      env:
-        GF_SECURITY_ADMIN_USER: ${{ secrets.GF_SECURITY_ADMIN_USER }}
-        GF_SECURITY_ADMIN_PASSWORD: ${{ secrets.GF_SECURITY_ADMIN_PASSWORD }}      
-      run: |
-        response=$(curl -s http://localhost:3000/api/dashboards/uid/adqssyxe0dkaoa -u $GF_SECURITY_ADMIN_USER:$GF_SECURITY_ADMIN_PASSWORD)
-        if [[ $response != *"cpu"* ]]; then
-          echo "CPU dashboard not found"
-          exit 1
-        fi
+      - name: Check Grafana Dashboard
+        env:
+          GF_SECURITY_ADMIN_USER: ${{ secrets.GF_SECURITY_ADMIN_USER }}
+          GF_SECURITY_ADMIN_PASSWORD: ${{ secrets.GF_SECURITY_ADMIN_PASSWORD }}
+        run: |
+          response=$(curl -s http://localhost:3000/api/dashboards/uid/adqssyxe0dkaoa -u $GF_SECURITY_ADMIN_USER:$GF_SECURITY_ADMIN_PASSWORD)
+          if [[ $response != *"cpu"* ]]; then
+            echo "CPU dashboard not found"
+            exit 1
+          fi
+
