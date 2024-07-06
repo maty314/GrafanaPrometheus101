@@ -21,8 +21,9 @@ This project sets up a monitoring system using Grafana and Prometheus with Docke
 ### Environment Variables
 
 Create a `.env` file in the root of the project with the following variables:
-`GF_SECURITY_ADMIN_USER=admin`
-`GF_SECURITY_ADMIN_PASSWORD=admin`
+
+-`GF_SECURITY_ADMIN_USER=admin`
+-`GF_SECURITY_ADMIN_PASSWORD=admin`
 
 ## Instructions
 
